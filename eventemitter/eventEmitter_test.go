@@ -1,4 +1,4 @@
-package nodejs
+package eventemitter
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	e = NewEventEmitter()
+	e = New()
 )
 
 func TestEventNames(t *testing.T) {

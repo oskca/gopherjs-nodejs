@@ -1,17 +1,18 @@
-package nodejs
+package eventemitter
 
 import (
 	"github.com/gopherjs/gopherjs/js"
+	nodejs "github.com/oskca/gopherjs-nodejs"
 )
 
 type EventListener func(em *EventEmitter, args ...*js.Object)
 
-func NewEventEmitter(obj ...*js.Object) *EventEmitter {
+func New(obj ...*js.Object) *EventEmitter {
 	em := new(EventEmitter)
 	if len(obj) > 0 {
 		em.Object = obj[0]
 	} else {
-		em.Object = js.Global.Call("require", "events").New()
+		em.Object = nodejs.Require("events").New()
 	}
 	return em
 }
@@ -208,7 +209,7 @@ type EventEmitter struct {
 // OnEvent wraps EventEmitter.on with *EventEmitter as the first arguments(this in JS)
 func (e *EventEmitter) OnEvent(eventName string, listener EventListener) *EventEmitter {
 	// fn := js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
-	// 	evt := NewEventEmitter(this)
+	// 	evt := New(this)
 	// 	listener(evt, args...)
 	// 	return 0
 	// })
@@ -235,7 +236,7 @@ func (e *EventEmitter) OnceEvent(eventName string, listener EventListener) *Even
 }
 
 // Once is a simplified version of OnEvent, using no this
-func (e *EventEmitter) Once(eventName string, listener func(args ...*js.Object)) *EventEmitter {
+func (e *EventEmitter) Once(eventName string, listener interface{}) *EventEmitter {
 	e.once(eventName, listener)
 	return e
 }
