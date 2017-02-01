@@ -35,3 +35,16 @@ func TestListener(t *testing.T) {
 	})
 	e.Emit("hi2", 10, "str")
 }
+
+func TestOnEvent(t *testing.T) {
+	e.OnEvent("hi3", func(em *EventEmitter, args ...*js.Object) {
+		t.Log("EventNames:", em.EventNames())
+		if em != e {
+			t.Fatal(" em != e ")
+		}
+		if len(em.EventNames()) != len(e.EventNames()) {
+			t.Fatal(" enents mismatch ")
+		}
+	})
+	e.Emit("hi3")
+}

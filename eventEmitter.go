@@ -4,7 +4,7 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
-type EventListener func(args ...*js.Object)
+type EventListener func(em *EventEmitter, args ...*js.Object)
 
 func NewEventEmitter(obj ...*js.Object) *EventEmitter {
 	em := new(EventEmitter)
@@ -19,11 +19,8 @@ func NewEventEmitter(obj ...*js.Object) *EventEmitter {
 type EventEmitter struct {
 	*js.Object
 	// emitter.addListener(eventName, listener)#
-	AddListener func(eventName string, listener EventListener) `js:"addListener"`
-
 	// Added in: v0.1.26
 	// Alias for emitter.on(eventName, listener).
-	On func(eventName string, listener EventListener) `js:"on"`
 
 	// emitter.emit(eventName[, ...args])#
 	//
@@ -74,19 +71,19 @@ type EventEmitter struct {
 	// // Prints: [ [Function] ]
 
 	// emitter.on(eventName, listener)#
-
+	//
 	// Added in: v0.1.101
 	// eventName <String> | <Symbol> The name of the event.
 	// listener <Function> The callback function
 	// Adds the listener function to the end of the listeners array for the event named eventName. No checks are made to see if the listener has already been added. Multiple calls passing the same combination of eventName and listener will result in the listener being added, and called, multiple times.
-
+	//
 	// server.on('connection', (stream) => {
 	//   console.log('someone connected!');
 	// });
 	// Returns a reference to the EventEmitter, so that calls can be chained.
-
+	//
 	// By default, event listeners are invoked in the order they are added. The emitter.prependListener() method can be used as an alternative to add the event listener to the beginning of the listeners array.
-
+	//
 	// const myEE = new EventEmitter();
 	// myEE.on('foo', () => console.log('a'));
 	// myEE.prependListener('foo', () => console.log('b'));
@@ -94,8 +91,10 @@ type EventEmitter struct {
 	// // Prints:
 	// //   b
 	// //   a
-	// emitter.once(eventName, listener)#
+	on func(eventName string, listener interface{}) `js:"on"`
 
+	// emitter.once(eventName, listener)#
+	//
 	// Added in: v0.3.0
 	// eventName <String> | <Symbol> The name of the event.
 	// listener <Function> The callback function
@@ -107,8 +106,7 @@ type EventEmitter struct {
 	// Returns a reference to the EventEmitter, so that calls can be chained.
 	//
 	// By default, event listeners are invoked in the order they are added. The emitter.prependOnceListener() method can be used as an alternative to add the event listener to the beginning of the listeners array.
-	Once func(eventName string, listener EventListener) `js:"once"`
-
+	//
 	// const myEE = new EventEmitter();
 	// myEE.once('foo', () => console.log('a'));
 	// myEE.prependOnceListener('foo', () => console.log('b'));
@@ -116,6 +114,8 @@ type EventEmitter struct {
 	// // Prints:
 	// //   b
 	// //   a
+	once func(eventName string, listener interface{}) `js:"once"`
+
 	// emitter.prependListener(eventName, listener)#
 
 	// Added in: v6.0.0
@@ -202,4 +202,39 @@ type EventEmitter struct {
 	// By default EventEmitters will print a warning if more than 10 listeners are added for a particular event. This is a useful default that helps finding memory leaks. Obviously, not all events should be limited to just 10 listeners. The emitter.setMaxListeners() method allows the limit to be modified for this specific EventEmitter instance. The value can be set to Infinity (or 0) to indicate an unlimited number of listeners.
 
 	// Returns a reference to the EventEmitter, so that calls can be chained.
+}
+
+// OnEvent wraps EventEmitter.on with *EventEmitter as the first arguments(this in JS)
+func (e *EventEmitter) OnEvent(eventName string, listener EventListener) *EventEmitter {
+	// fn := js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
+	// 	evt := NewEventEmitter(this)
+	// 	listener(evt, args...)
+	// 	return 0
+	// })
+	fn := func(args ...*js.Object) {
+		listener(e, args...)
+	}
+	e.on(eventName, fn)
+	return e
+}
+
+// On is a simplified version of OnEvent, using no this
+func (e *EventEmitter) On(eventName string, listener func(args ...*js.Object)) *EventEmitter {
+	e.on(eventName, listener)
+	return e
+}
+
+// OnceEvent wraps once with `this` support
+func (e *EventEmitter) OnceEvent(eventName string, listener EventListener) *EventEmitter {
+	fn := func(args ...*js.Object) {
+		listener(e, args...)
+	}
+	e.once(eventName, fn)
+	return e
+}
+
+// Once is a simplified version of OnEvent, using no this
+func (e *EventEmitter) Once(eventName string, listener func(args ...*js.Object)) *EventEmitter {
+	e.once(eventName, listener)
+	return e
 }
