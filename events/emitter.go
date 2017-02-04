@@ -5,7 +5,7 @@ import (
 	nodejs "github.com/oskca/gopherjs-nodejs"
 )
 
-type EventListener func(em *Emitter, args ...*js.Object)
+type Listener func(em *Emitter, args ...*js.Object)
 
 func New(obj ...*js.Object) *Emitter {
 	em := new(Emitter)
@@ -207,7 +207,7 @@ type Emitter struct {
 }
 
 // OnEvent wraps Emitter.on with *Emitter as the first arguments(this in JS)
-func (e *Emitter) OnEvent(eventName string, listener EventListener) *Emitter {
+func (e *Emitter) OnEvent(eventName string, listener Listener) *Emitter {
 	// fn := js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
 	// 	evt := New(this)
 	// 	listener(evt, args...)
@@ -227,7 +227,7 @@ func (e *Emitter) On(eventName string, listener func(args ...*js.Object)) *Emitt
 }
 
 // OnceEvent wraps once with `this` support
-func (e *Emitter) OnceEvent(eventName string, listener EventListener) *Emitter {
+func (e *Emitter) OnceEvent(eventName string, listener Listener) *Emitter {
 	fn := func(args ...*js.Object) {
 		listener(e, args...)
 	}
