@@ -1,4 +1,4 @@
-package eventemitter
+package Emitter
 
 import (
 	"testing"
@@ -37,7 +37,7 @@ func TestListener(t *testing.T) {
 }
 
 func TestOnEvent(t *testing.T) {
-	e.OnEvent("hi3", func(em *EventEmitter, args ...*js.Object) {
+	e.OnEvent("hi3", func(em *Emitter, args ...*js.Object) {
 		t.Log("EventNames:", em.EventNames())
 		if em != e {
 			t.Fatal(" em != e ")

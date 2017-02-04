@@ -1,14 +1,14 @@
-package eventemitter
+package Emitter
 
 import (
 	"github.com/gopherjs/gopherjs/js"
 	nodejs "github.com/oskca/gopherjs-nodejs"
 )
 
-type EventListener func(em *EventEmitter, args ...*js.Object)
+type EventListener func(em *Emitter, args ...*js.Object)
 
-func New(obj ...*js.Object) *EventEmitter {
-	em := new(EventEmitter)
+func New(obj ...*js.Object) *Emitter {
+	em := new(Emitter)
 	if len(obj) > 0 {
 		em.Object = obj[0]
 	} else {
@@ -17,7 +17,7 @@ func New(obj ...*js.Object) *EventEmitter {
 	return em
 }
 
-type EventEmitter struct {
+type Emitter struct {
 	*js.Object
 	// emitter.addListener(eventName, listener)#
 	// Added in: v0.1.26
@@ -36,8 +36,8 @@ type EventEmitter struct {
 	// Added in: v6.0.0
 	// Returns an array listing the events for which the emitter has registered listeners. The values in the array will be strings or Symbols.
 	//
-	// const EventEmitter = require('events');
-	// const myEE = new EventEmitter();
+	// const Emitter = require('events');
+	// const myEE = new Emitter();
 	// myEE.on('foo', () => {});
 	// myEE.on('bar', () => {});
 	//
@@ -51,7 +51,7 @@ type EventEmitter struct {
 	// emitter.getMaxListeners()#
 
 	// Added in: v1.0.0
-	// Returns the current max listener value for the EventEmitter which is either set by emitter.setMaxListeners(n) or defaults to EventEmitter.defaultMaxListeners.
+	// Returns the current max listener value for the Emitter which is either set by emitter.setMaxListeners(n) or defaults to Emitter.defaultMaxListeners.
 	//
 	// emitter.listenerCount(eventName)#
 	LinstenerCount func(eventName string) int `js:"listenerCount"`
@@ -81,11 +81,11 @@ type EventEmitter struct {
 	// server.on('connection', (stream) => {
 	//   console.log('someone connected!');
 	// });
-	// Returns a reference to the EventEmitter, so that calls can be chained.
+	// Returns a reference to the Emitter, so that calls can be chained.
 	//
 	// By default, event listeners are invoked in the order they are added. The emitter.prependListener() method can be used as an alternative to add the event listener to the beginning of the listeners array.
 	//
-	// const myEE = new EventEmitter();
+	// const myEE = new Emitter();
 	// myEE.on('foo', () => console.log('a'));
 	// myEE.prependListener('foo', () => console.log('b'));
 	// myEE.emit('foo');
@@ -104,11 +104,11 @@ type EventEmitter struct {
 	// server.once('connection', (stream) => {
 	//   console.log('Ah, we have our first user!');
 	// });
-	// Returns a reference to the EventEmitter, so that calls can be chained.
+	// Returns a reference to the Emitter, so that calls can be chained.
 	//
 	// By default, event listeners are invoked in the order they are added. The emitter.prependOnceListener() method can be used as an alternative to add the event listener to the beginning of the listeners array.
 	//
-	// const myEE = new EventEmitter();
+	// const myEE = new Emitter();
 	// myEE.once('foo', () => console.log('a'));
 	// myEE.prependOnceListener('foo', () => console.log('b'));
 	// myEE.emit('foo');
@@ -127,7 +127,7 @@ type EventEmitter struct {
 	// server.prependListener('connection', (stream) => {
 	//   console.log('someone connected!');
 	// });
-	// Returns a reference to the EventEmitter, so that calls can be chained.
+	// Returns a reference to the Emitter, so that calls can be chained.
 
 	// emitter.prependOnceListener(eventName, listener)#
 
@@ -139,16 +139,16 @@ type EventEmitter struct {
 	// server.prependOnceListener('connection', (stream) => {
 	//   console.log('Ah, we have our first user!');
 	// });
-	// Returns a reference to the EventEmitter, so that calls can be chained.
+	// Returns a reference to the Emitter, so that calls can be chained.
 
 	// emitter.removeAllListeners([eventName])#
 	//
 	// Added in: v0.1.26
 	// Removes all listeners, or those of the specified eventName.
 	//
-	// Note that it is bad practice to remove listeners added elsewhere in the code, particularly when the EventEmitter instance was created by some other component or module (e.g. sockets or file streams).
+	// Note that it is bad practice to remove listeners added elsewhere in the code, particularly when the Emitter instance was created by some other component or module (e.g. sockets or file streams).
 	//
-	// Returns a reference to the EventEmitter, so that calls can be chained.
+	// Returns a reference to the Emitter, so that calls can be chained.
 	RemoveAllListener func(eventName ...string) `js:"removeAllListeners"`
 
 	// emitter.removeListener(eventName, listener)#
@@ -195,19 +195,19 @@ type EventEmitter struct {
 	// //   A
 	// Because listeners are managed using an internal array, calling this will change the position indices of any listener registered after the listener being removed. This will not impact the order in which listeners are called, but it means that any copies of the listener array as returned by the emitter.listeners() method will need to be recreated.
 
-	// Returns a reference to the EventEmitter, so that calls can be chained.
+	// Returns a reference to the Emitter, so that calls can be chained.
 
 	// emitter.setMaxListeners(n)#
 
 	// Added in: v0.3.5
-	// By default EventEmitters will print a warning if more than 10 listeners are added for a particular event. This is a useful default that helps finding memory leaks. Obviously, not all events should be limited to just 10 listeners. The emitter.setMaxListeners() method allows the limit to be modified for this specific EventEmitter instance. The value can be set to Infinity (or 0) to indicate an unlimited number of listeners.
+	// By default Emitters will print a warning if more than 10 listeners are added for a particular event. This is a useful default that helps finding memory leaks. Obviously, not all events should be limited to just 10 listeners. The emitter.setMaxListeners() method allows the limit to be modified for this specific Emitter instance. The value can be set to Infinity (or 0) to indicate an unlimited number of listeners.
 
-	// Returns a reference to the EventEmitter, so that calls can be chained.
+	// Returns a reference to the Emitter, so that calls can be chained.
 	PreventDefault func() `js:"preventDefault"`
 }
 
-// OnEvent wraps EventEmitter.on with *EventEmitter as the first arguments(this in JS)
-func (e *EventEmitter) OnEvent(eventName string, listener EventListener) *EventEmitter {
+// OnEvent wraps Emitter.on with *Emitter as the first arguments(this in JS)
+func (e *Emitter) OnEvent(eventName string, listener EventListener) *Emitter {
 	// fn := js.MakeFunc(func(this *js.Object, args []*js.Object) interface{} {
 	// 	evt := New(this)
 	// 	listener(evt, args...)
@@ -221,13 +221,13 @@ func (e *EventEmitter) OnEvent(eventName string, listener EventListener) *EventE
 }
 
 // On is a simplified version of OnEvent, using no this
-func (e *EventEmitter) On(eventName string, listener func(args ...*js.Object)) *EventEmitter {
+func (e *Emitter) On(eventName string, listener func(args ...*js.Object)) *Emitter {
 	e.on(eventName, listener)
 	return e
 }
 
 // OnceEvent wraps once with `this` support
-func (e *EventEmitter) OnceEvent(eventName string, listener EventListener) *EventEmitter {
+func (e *Emitter) OnceEvent(eventName string, listener EventListener) *Emitter {
 	fn := func(args ...*js.Object) {
 		listener(e, args...)
 	}
@@ -236,7 +236,7 @@ func (e *EventEmitter) OnceEvent(eventName string, listener EventListener) *Even
 }
 
 // Once is a simplified version of OnEvent, using no this
-func (e *EventEmitter) Once(eventName string, listener interface{}) *EventEmitter {
+func (e *Emitter) Once(eventName string, listener interface{}) *Emitter {
 	e.once(eventName, listener)
 	return e
 }
