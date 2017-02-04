@@ -1,4 +1,4 @@
-package Emitter
+package events
 
 import (
 	"github.com/gopherjs/gopherjs/js"
